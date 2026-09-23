@@ -1,4 +1,108 @@
-#!/bin/bash
+#!/bin/bash#!/bin/bash
+
+# ============================================================
+# Automated Tests
+# Linux Security Assignment
+# ============================================================
+
+PASS=0
+FAIL=0
+
+GROUP_NAME="students"
+
+USER1="student1"
+USER2="student2"
+UNAUTHORIZED="unauthorized"
+
+STUDENT_DIR="/opt/department/students"
+TEST_FILE="${STUDENT_DIR}/student_info.txt"
+
+pass() {
+    echo "[PASS] $1"
+    PASS=$((PASS + 1))
+}
+
+fail() {
+    echo "[FAIL] $1"
+    FAIL=$((FAIL + 1))
+}
+
+echo "======================================"
+echo " Running Linux Security Tests"
+echo "======================================"
+
+# ------------------------------------------------------------
+# Test 1: Root
+# ------------------------------------------------------------
+if [ "$(id -u)" -eq 0 ]; then
+    pass "Tests are running as root"
+else
+    fail "Tests must run as root"
+fi
+
+# ------------------------------------------------------------
+# Test 2: SELinux enforcing
+# ------------------------------------------------------------
+if command -v getenforce >/dev/null 2>&1; then
+    SELINUX_STATUS=$(getenforce)
+    if [ "$SELINUX_STATUS" = "Enforcing" ]; then
+        pass "SELinux is Enforcing"
+    else
+        fail "SELinux is not Enforcing"
+    fi
+else
+    fail "getenforce command not found"
+fi
+
+# ------------------------------------------------------------
+# Test 3: Group exists
+# ------------------------------------------------------------
+if getent group "$GROUP_NAME" >/dev/null 2>&1; then
+    pass "Group '$GROUP_NAME' exists"
+else
+    fail "Group '$GROUP_NAME' does not exist"
+fi
+
+# ------------------------------------------------------------
+# Test 4: student1 exists
+# ------------------------------------------------------------
+if id "$USER1" >/dev/null 2>&1; then
+    pass "User '$USER1' exists"
+else
+    fail "User '$USER1' does not exist"
+fi
+
+# ------------------------------------------------------------
+# Test 5: student2 exists
+# ------------------------------------------------------------
+if id "$USER2" >/dev/null 2>&1; then
+    pass "User '$USER2' exists"
+else
+    fail "User '$USER2' does not exist"
+fi
+
+# ------------------------------------------------------------
+# Test 6: unauthorized exists
+# ------------------------------------------------------------
+if id "$UNAUTHORIZED" >/dev/null 2>&1; then
+    pass "User '$UNAUTHORIZED' exists"
+else
+    fail "User '$UNAUTHORIZED' does not exist"
+fi
+
+# ------------------------------------------------------------
+# Test 7: student1 belongs to students
+# ------------------------------------------------------------
+if id -nG "$USER1" 2>/dev/null \vert{} tr ' ' '\n' \vert{} grep -qx "$GROUP_NAME"; then
+    pass "$USER1 belongs to$GROUP_NAME"
+else
+    fail "$USER1 does not belong to$GROUP_NAME"
+fi
+
+# ------------------------------------------------------------
+# Test 8: student2 belongs to students
+# ------------------------------------------------------------
+if id -
 
 # ============================================================
 
